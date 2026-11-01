@@ -1,0 +1,17 @@
+[package]
+name = "dromedary-static"
+description = "Static file serving with compression — replaces Python SimpleHTTP"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+tokio = { workspace = true }
+tower-http = { workspace = true }
+tracing = { workspace = true }
+serde = { workspace = true }
+
+[lints]
+workspace = true

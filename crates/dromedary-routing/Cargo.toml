@@ -1,0 +1,16 @@
+[package]
+name = "dromedary-routing"
+description = "Host-based routing — hostname → backend resolution"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+
+[lints]
+workspace = true
