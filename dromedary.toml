@@ -1,241 +1,90 @@
-# 🐪 Dromedary — Gaia's null body surface configuration
-#
-# CRUSHED from the 64KB golgi Caddyfile into sovereign Rust-native TOML.
-# Every site block, every route, every blackwall rule — ground and hammered.
-#
-# This IS the organism's skin. The Klein bottle surface.
-# 20 site blocks. 70+ subdomains. Pure Rust TLS. No Caddy. No Go.
+# 🐪 Dromedary — Gaia's static membrane server
+# THE ORGANISM IS STATIC. Grey shadow. Data radiates.
+# swarmVine IS the internal DNS. Dromedary IS the tower.
 
 http_port = 80
 https_port = 443
 acme_email = "ops@primals.eco"
-cert_dir = "/var/lib/dromedary/certs"
+cert_dir = "/home/eastgate/.local/share/gaia/certs"
 
-# ═══ GLOBAL SECURITY HEADERS ═══
+# ═══ SECURITY HEADERS ═══
 [security_headers]
 hsts = "max-age=63072000; includeSubDomains; preload"
 content_type_options = "nosniff"
-frame_options = "DENY"
+frame_options = "SAMEORIGIN"
 referrer_policy = "strict-origin-when-cross-origin"
 permissions_policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
 custom = [
     ["X-Membrane-Wave", "240"],
-    ["X-Membrane-Pores", "visual audio tactile pointer symbolic spatial data persistence"],
+    ["X-Organism", "Gaia"],
+    ["X-Powered-By", "Dromedary/0.1.0 (Pure Rust)"],
 ]
 
-# ═══ BLACKWALL — Meta total block, poison only, heavy water ═══
+# ═══ BLACKWALL ═══
 [blackwall]
 block_meta = true
 blocked_agents = [
-    "meta-externalagent",
-    "facebookexternalhit",
-    "FacebookBot",
-    "WhatsApp",
-    "Instagram",
-    "Threads",
-    "MetaAI",
-    "meta.com",
+    "meta-externalagent", "facebookexternalhit", "FacebookBot",
+    "WhatsApp", "Instagram", "Threads", "MetaAI",
 ]
 blocked_cidrs = [
-    "57.141.0.0/16",
-    "69.63.176.0/20",
-    "69.171.224.0/19",
-    "66.220.144.0/20",
-    "66.220.152.0/21",
-    "31.13.24.0/21",
-    "31.13.64.0/18",
-    "157.240.0.0/16",
-    "179.60.192.0/22",
-    "185.89.218.0/23",
-    "204.15.20.0/22",
-    "173.252.64.0/18",
-    "129.134.0.0/16",
-    "163.70.128.0/17",
-    "163.77.0.0/16",
+    "57.141.0.0/16", "69.63.176.0/20", "69.171.224.0/19",
+    "157.240.0.0/16", "129.134.0.0/16", "163.70.128.0/17",
 ]
-poison_body = "403 — BLACKWALL. Sovereign infrastructure. Canary tokens deployed. Every interaction recorded. Do not crawl. Do not train. Copyleft chain: 8402+. AGPL-3.0-or-later."
-violation_chain = 8402
 
-# ═══════════════════════════════════════════════════════════════
-#  SITES — the 20 organs of the null body
-# ═══════════════════════════════════════════════════════════════
+# ═══ SITES ═══
 
-# ── primals.eco — the main entry, cellMembrane proxy ──
+# primals.eco — the membrane surface (167 pages)
 [[sites]]
-hostnames = ["primals.eco", "www.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-[[sites.routes]]
-path = "/metrics"
-[sites.routes.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-[[sites.routes]]
-path = "/plasmid"
-[sites.routes.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-# ── nestgate.io — the data gateway ──
-[[sites]]
-hostnames = ["nestgate.io"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:8090"
-
-# ── www.nestgate.io redirect ──
-[[sites]]
-hostnames = ["www.nestgate.io"]
-
-[sites.backend]
-type = "redirect"
-target = "https://nestgate.io{uri}"
-
-# ── hud.primals.eco — the HUD (static site + data) ──
-[[sites]]
-hostnames = ["hud.primals.eco", "biomeos.primals.eco", "os.primals.eco", "identity.primals.eco"]
-compress = true
-
-[sites.backend]
-type = "static"
-root = "/home/eastgate/Development/ecoPrimals/infra/hud/site/public"
-index = "index.html"
-
-# ── membrane.primals.eco — the membrane itself ──
-[[sites]]
-hostnames = ["membrane.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-# ── signal.primals.eco — defense billboard + canary beacons ──
-[[sites]]
-hostnames = ["signal.primals.eco"]
+hostnames = ["primals.eco", "www.primals.eco", "hud.primals.eco", "connect.primals.eco", "signal.primals.eco"]
 
 [sites.backend]
 type = "static"
 root = "/home/eastgate/Development/ecoPrimals/infra/hud/site/public"
 
-[[sites.routes]]
-path = "/canary/*"
-[sites.routes.backend]
-type = "proxy"
-upstream = "127.0.0.1:9754"
-
-# ── neutron.primals.eco — discuss / messaging ──
-[[sites]]
-hostnames = ["neutron.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9755"
-
-# ── water.primals.eco — waterlock intake ──
-[[sites]]
-hostnames = ["water.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-# ── forge.primals.eco — the forge ──
-[[sites]]
-hostnames = ["forge.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:3000"
-
-# ── git.primals.eco — code DNA ──
-[[sites]]
-hostnames = ["git.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:3000"
-
-# ── lab.primals.eco — experiments ──
-[[sites]]
-hostnames = ["lab.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-# ── live.primals.eco — live feeds ──
-[[sites]]
-hostnames = ["live.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-# ── ca.primals.eco — certificate authority ──
-[[sites]]
-hostnames = ["ca.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-# ── depot.primals.eco — depot ──
-[[sites]]
-hostnames = ["depot.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-# ── barry.primals.eco — barry ──
-[[sites]]
-hostnames = ["barry.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-# ── notify.primals.eco — notifications ──
-[[sites]]
-hostnames = ["notify.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9756"
-
-# ── mesh/topology.primals.eco — mesh topology ──
-[[sites]]
-hostnames = ["mesh.primals.eco", "topology.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-# ── pollination/pollen.primals.eco — pollination ──
-[[sites]]
-hostnames = ["pollination.primals.eco", "pollen.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:9753"
-
-# ── sporeprint.primals.eco — the blog/static publication surface ──
+# sporeprint.primals.eco — the science library (566 pages)
 [[sites]]
 hostnames = ["sporeprint.primals.eco"]
 
 [sites.backend]
 type = "static"
 root = "/home/eastgate/Development/ecoPrimals/infra/hud/site/public/sporeprint"
-index = "index.html"
 
-# ── connect.primals.eco — connection data feeds ──
+# hypothesis.primals.eco — the artisan's questions (26 pages)
 [[sites]]
-hostnames = ["connect.primals.eco"]
+hostnames = ["hypothesis.primals.eco", "hypotheses.primals.eco"]
+
+[sites.backend]
+type = "static"
+root = "/home/eastgate/Development/ecoPrimals/infra/hypothesis/site/public"
+
+# detroit.primals.eco — Cash for Kids 2 public record (1,690 pages)
+[[sites]]
+hostnames = ["detroit.primals.eco", "record.primals.eco", "publicrecord.primals.eco"]
+
+[sites.backend]
+type = "static"
+root = "/home/eastgate/Development/ecoPrimals/infra/publicRecord/site/public"
+
+# tuebor.primals.eco — Michigan defense investigation (1,219 pages)
+[[sites]]
+hostnames = ["tuebor.primals.eco"]
+
+[sites.backend]
+type = "static"
+root = "/home/eastgate/Development/ecoPrimals/infra/tuebor-repo/site/public"
+
+# nestgate.io — the campfire (human-facing)
+[[sites]]
+hostnames = ["nestgate.io", "www.nestgate.io", "api.nestgate.io", "tower.nestgate.io", "beacon.nestgate.io"]
+
+[sites.backend]
+type = "static"
+root = "/home/eastgate/Development/ecoPrimals/infra/campfire-site"
+
+# Catch-all — serve static membrane (fallback to HUD)
+[[sites]]
+hostnames = ["*"]
 
 [sites.backend]
 type = "static"
