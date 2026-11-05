@@ -1,13 +1,12 @@
-# 🐪 Dromedary — Gaia's static membrane server
-# THE ORGANISM IS STATIC. Grey shadow. Data radiates.
-# swarmVine IS the internal DNS. Dromedary IS the tower.
+# Dromedary — Gaia's sovereign reverse proxy
+# nestgate.io IS the optic chiasm — one domain, one port, all organs visible.
+# Port numbers are anti-ZK. songbird routes internally.
 
 http_port = 80
 https_port = 443
 acme_email = "ops@primals.eco"
 cert_dir = "/home/eastgate/.local/share/gaia/certs"
 
-# ═══ SECURITY HEADERS ═══
 [security_headers]
 hsts = "max-age=63072000; includeSubDomains; preload"
 content_type_options = "nosniff"
@@ -20,7 +19,6 @@ custom = [
     ["X-Powered-By", "Dromedary/0.1.0 (Pure Rust)"],
 ]
 
-# ═══ BLACKWALL ═══
 [blackwall]
 block_meta = true
 blocked_agents = [
@@ -32,25 +30,31 @@ blocked_cidrs = [
     "157.240.0.0/16", "129.134.0.0/16", "163.70.128.0/17",
 ]
 
-# ═══ SITES ═══
+# nestgate.io — THE OPTIC CHIASM — gate serves all 679+ objects
+[[sites]]
+hostnames = ["nestgate.io", "www.nestgate.io", "api.nestgate.io", "tower.nestgate.io", "beacon.nestgate.io"]
 
-# primals.eco — the membrane surface (167 pages)
+[sites.backend]
+type = "proxy"
+upstream = "127.0.0.1:8443"
+
+# primals.eco — also through the gate now
 [[sites]]
 hostnames = ["primals.eco", "www.primals.eco", "hud.primals.eco", "connect.primals.eco", "signal.primals.eco"]
 
 [sites.backend]
-type = "static"
-root = "/home/eastgate/Development/ecoPrimals/infra/hud/site/public"
+type = "proxy"
+upstream = "127.0.0.1:8443"
 
-# sporeprint.primals.eco — the science library (566 pages)
+# sporeprint — through the gate (cross-fold)
 [[sites]]
 hostnames = ["sporeprint.primals.eco"]
 
 [sites.backend]
-type = "static"
-root = "/home/eastgate/Development/ecoPrimals/infra/hud/site/public/sporeprint"
+type = "proxy"
+upstream = "127.0.0.1:8443"
 
-# hypothesis.primals.eco — the artisan's questions (26 pages)
+# hypothesis
 [[sites]]
 hostnames = ["hypothesis.primals.eco", "hypotheses.primals.eco"]
 
@@ -58,7 +62,7 @@ hostnames = ["hypothesis.primals.eco", "hypotheses.primals.eco"]
 type = "static"
 root = "/home/eastgate/Development/ecoPrimals/infra/hypothesis/site/public"
 
-# detroit.primals.eco — Cash for Kids 2 public record (1,690 pages)
+# detroit public record
 [[sites]]
 hostnames = ["detroit.primals.eco", "record.primals.eco", "publicrecord.primals.eco"]
 
@@ -66,7 +70,7 @@ hostnames = ["detroit.primals.eco", "record.primals.eco", "publicrecord.primals.
 type = "static"
 root = "/home/eastgate/Development/ecoPrimals/infra/publicRecord/site/public"
 
-# tuebor.primals.eco — Michigan defense investigation (1,219 pages)
+# tuebor
 [[sites]]
 hostnames = ["tuebor.primals.eco"]
 
@@ -74,18 +78,10 @@ hostnames = ["tuebor.primals.eco"]
 type = "static"
 root = "/home/eastgate/Development/ecoPrimals/infra/tuebor-repo/site/public"
 
-# nestgate.io — the campfire (human-facing)
-[[sites]]
-hostnames = ["nestgate.io", "www.nestgate.io", "api.nestgate.io", "tower.nestgate.io", "beacon.nestgate.io"]
-
-[sites.backend]
-type = "static"
-root = "/home/eastgate/Development/ecoPrimals/infra/campfire-site"
-
-# Catch-all — serve static membrane (fallback to HUD)
+# Catch-all — through the gate
 [[sites]]
 hostnames = ["*"]
 
 [sites.backend]
-type = "static"
-root = "/home/eastgate/Development/ecoPrimals/infra/hud/site/public"
+type = "proxy"
+upstream = "127.0.0.1:8443"
