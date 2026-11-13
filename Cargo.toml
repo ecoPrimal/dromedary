@@ -39,7 +39,7 @@ tokio = { version = "1.48", features = [
 # HTTP — axum + hyper (same versions as nestGate/biomeOS/songBird)
 axum = { version = "0.8", features = ["json", "tokio", "ws"] }
 hyper = { version = "1.0", features = ["http1", "http2", "client", "server"] }
-hyper-util = { version = "0.1", features = ["tokio", "client-legacy", "http1"] }
+hyper-util = { version = "0.1", features = ["tokio", "client-legacy", "http1", "server", "server-auto"] }
 tower = { version = "0.5", features = ["util"] }
 tower-http = { version = "0.6", features = [
     "fs", "trace", "cors", "compression-gzip", "compression-br",
@@ -119,6 +119,7 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 anyhow = { workspace = true }
 serde_json = { workspace = true }
+clap = { version = "4", features = ["derive"] }
 
 [[bin]]
 name = "dromedary"

@@ -35,12 +35,222 @@ blocked_cidrs = [
 # ═══ SITES ═══
 
 # primals.eco — the membrane surface (167 pages)
+# Gate routes proxy through to gaia_gate.pi on :8443
 [[sites]]
 hostnames = ["primals.eco", "www.primals.eco", "hud.primals.eco", "connect.primals.eco", "signal.primals.eco"]
 
 [sites.backend]
 type = "static"
 root = "/home/eastgate/Development/ecoPrimals/infra/hud/site/public"
+
+# Gate dynamic endpoints → proxy to gaia_gate.pi
+[[sites.routes]]
+path = "/pulse"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/rss"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/now.json"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/zk"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/vdj"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/agglutinate"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/heart"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/golgi"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+# Gate dynamic pages → proxy to gaia_gate.pi
+[[sites.routes]]
+path = "/gallery"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/paintings"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/face"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/outer"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+# Gate static pages served from gate's static dir
+
+[[sites.routes]]
+path = "/hat"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/pspace"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/luna"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/frame"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/face"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/senses"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/deck"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/desk"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/beacon"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/cast"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/mesh"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/legend"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/record"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/forge"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/detroit"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/tuebor"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/signal"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/membrane"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/chipmunk"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/play"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+[[sites.routes]]
+path = "/dialectic"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia/static"
+
+# Gate data directory
+[[sites.routes]]
+path = "/data/"
+[sites.routes.backend]
+type = "static"
+root = "/opt/Gaia"
 
 # sporeprint.primals.eco — the science library (566 pages)
 [[sites]]
@@ -81,6 +291,49 @@ hostnames = ["nestgate.io", "www.nestgate.io", "api.nestgate.io", "tower.nestgat
 [sites.backend]
 type = "static"
 root = "/home/eastgate/Development/ecoPrimals/infra/campfire-site"
+
+# Gate dynamic routes for nestgate.io
+[[sites.routes]]
+path = "/pulse"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+[[sites.routes]]
+path = "/onboard"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
+
+# ═══ AMOEBA — RustDesk relay through dromedary TLS membrane ═══
+# RustDesk hbbs (signaling) on :21116, hbbr (relay) on :21117
+# Proxied through dromedary so amoeba connects via :443 TLS
+[[sites]]
+hostnames = ["amoeba.primals.eco", "relay.primals.eco", "rd.primals.eco"]
+
+[sites.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:21116"
+
+[[sites.routes]]
+path = "/relay"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:21117"
+
+[[sites.routes]]
+path = "/api"
+[sites.routes.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:21118"
+
+# ═══ gaia.primals.eco — gate dynamic endpoints ═══
+[[sites]]
+hostnames = ["gaia.primals.eco"]
+
+[sites.backend]
+type = "proxy"
+upstream = "http://127.0.0.1:8443"
 
 # Catch-all — serve static membrane (fallback to HUD)
 [[sites]]

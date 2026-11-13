@@ -165,9 +165,14 @@ impl DromedaryConfig {
 
     /// Find the site that matches a hostname.
     pub fn find_site(&self, hostname: &str) -> Option<&DromedarySite> {
+        // First try exact match, then wildcard, then catch-all "*"
         self.sites.iter().find(|s| {
-            s.hostnames.iter().any(|h| {
-                h == hostname || (h.starts_with("*.") && hostname.ends_with(&h[1..]))
+            s.hostnames.iter().any(|h| h == hostname)
+        }).or_else(|| {
+            self.sites.iter().find(|s| {
+                s.hostnames.iter().any(|h| {
+                    (h.starts_with("*.") && hostname.ends_with(&h[1..])) || h == "*"
+                })
             })
         })
     }
