@@ -12,6 +12,7 @@ use axum::response::{IntoResponse, Redirect, Response};
 use axum::Router;
 use tokio::net::TcpListener;
 
+use axum::body::Bytes;
 use crate::config::{DromedaryConfig, SiteBackend};
 
 /// Extract hostname from request headers.
@@ -171,20 +172,47 @@ async fn route_request(
     };
 
     let path = req.uri().path().to_string();
+    let method = match req.method().clone() {
+        axum::http::Method::GET => reqwest::Method::GET,
+        axum::http::Method::POST => reqwest::Method::POST,
+        axum::http::Method::PUT => reqwest::Method::PUT,
+        axum::http::Method::DELETE => reqwest::Method::DELETE,
+        axum::http::Method::PATCH => reqwest::Method::PATCH,
+        axum::http::Method::OPTIONS => reqwest::Method::OPTIONS,
+        axum::http::Method::HEAD => reqwest::Method::HEAD,
+        _ => reqwest::Method::GET,
+    };
+
+    let content_type = req.headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .map(|s| s.to_string());
+
+    let body_bytes = match axum::body::to_bytes(req.into_body(), 10 * 1024 * 1024).await {
+        Ok(b) if !b.is_empty() => Some(b),
+        _ => None,
+    };
 
     // Check sub-routes first
     for route in &site.routes {
         let route_path = route.path.trim_end_matches('*');
         if path.starts_with(route_path) {
-            return serve_backend(&route.backend, &path, client_ip).await;
+            return serve_backend(&route.backend, &path, client_ip, method, body_bytes, content_type).await;
         }
     }
 
-    serve_backend(&site.backend, &path, client_ip).await
+    serve_backend(&site.backend, &path, client_ip, method, body_bytes, content_type).await
 }
 
 /// Serve a request against a specific backend.
-async fn serve_backend(backend: &SiteBackend, path: &str, client_ip: Option<std::net::IpAddr>) -> Response {
+async fn serve_backend(
+    backend: &SiteBackend,
+    path: &str,
+    client_ip: Option<std::net::IpAddr>,
+    method: reqwest::Method,
+    body: Option<Bytes>,
+    content_type: Option<String>,
+) -> Response {
     match backend {
         SiteBackend::Redirect { target } => {
             Redirect::permanent(target).into_response()
@@ -239,26 +267,37 @@ async fn serve_backend(backend: &SiteBackend, path: &str, client_ip: Option<std:
                     target_path = format!("/{target_path}");
                 }
             }
-            let url = format!("{upstream}{target_path}");
-            tracing::debug!("🐪 proxy → {url}");
+            let scheme = if upstream.starts_with("http://") || upstream.starts_with("https://") { "" } else { "http://" };
+            let url = format!("{scheme}{upstream}{target_path}");
+            tracing::debug!("🐪 proxy {method} → {url}");
 
-            // SET (never append/copy) from the socket so a client cannot forge its own identity upstream.
-            let mut upstream_req = reqwest::Client::new().get(&url);
+            let client = reqwest::Client::builder()
+                .timeout(std::time::Duration::from_secs(120))
+                .build()
+                .unwrap_or_else(|_| reqwest::Client::new());
+
+            let mut upstream_req = client.request(method.clone(), &url);
             if let Some(ip) = client_ip {
                 upstream_req = upstream_req.header("X-Forwarded-For", ip.to_string());
+            }
+            if let Some(ct) = content_type {
+                upstream_req = upstream_req.header("Content-Type", ct);
+            }
+            if let Some(b) = body {
+                upstream_req = upstream_req.body(b);
             }
             match upstream_req.send().await {
                 Ok(resp) => {
                     let status = StatusCode::from_u16(resp.status().as_u16())
                         .unwrap_or(StatusCode::BAD_GATEWAY);
-                    let content_type = resp.headers()
+                    let resp_ct = resp.headers()
                         .get("content-type")
                         .and_then(|v| v.to_str().ok())
                         .unwrap_or("application/octet-stream")
                         .to_string();
                     match resp.bytes().await {
                         Ok(body) => {
-                            (status, [("content-type", content_type)], body).into_response()
+                            (status, [("content-type", resp_ct)], body).into_response()
                         }
                         Err(e) => {
                             tracing::warn!("🐪 proxy body error: {e}");
