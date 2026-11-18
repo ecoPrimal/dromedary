@@ -218,3 +218,15 @@ compress = true
 [sites.backend]
 type = "proxy"
 upstream = "127.0.0.1:9755"
+
+# ═══ WILDCARD CATCH-ALL ═══
+# The * root — catches any subdomain not explicitly listed above.
+# Routes to webpi (:8080) which handles all content.
+# This is the CHUTE — anything that falls through lands here.
+[[sites]]
+hostnames = ["*.primals.eco"]
+compress = true
+
+[sites.backend]
+type = "proxy"
+upstream = "127.0.0.1:8080"
