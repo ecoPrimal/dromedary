@@ -1,0 +1,14 @@
+[Unit]
+Description=Dromedary — Gaia's sovereign reverse proxy + TLS
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/eastgate/Development/ecoPrimals/primals/dromedary
+ExecStart=/home/eastgate/Development/ecoPrimals/primals/dromedary/target/release/dromedary --config /home/eastgate/Development/ecoPrimals/primals/dromedary/dromedary.toml
+Restart=always
+RestartSec=5
+Environment=RUST_LOG=dromedary=info
+
+[Install]
+WantedBy=default.target
