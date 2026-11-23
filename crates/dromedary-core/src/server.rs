@@ -197,11 +197,11 @@ async fn route_request(
     for route in &site.routes {
         let route_path = route.path.trim_end_matches('*');
         if path.starts_with(route_path) {
-            return serve_backend(&route.backend, &path, client_ip, method, body_bytes, content_type).await;
+            return serve_backend(&route.backend, &path, client_ip, method, body_bytes, content_type, Some(hostname)).await;
         }
     }
 
-    serve_backend(&site.backend, &path, client_ip, method, body_bytes, content_type).await
+    serve_backend(&site.backend, &path, client_ip, method, body_bytes, content_type, Some(hostname)).await
 }
 
 /// Serve a request against a specific backend.
@@ -212,6 +212,7 @@ async fn serve_backend(
     method: reqwest::Method,
     body: Option<Bytes>,
     content_type: Option<String>,
+    original_host: Option<&str>,
 ) -> Response {
     match backend {
         SiteBackend::Redirect { target } => {
@@ -279,6 +280,10 @@ async fn serve_backend(
             let mut upstream_req = client.request(method.clone(), &url);
             if let Some(ip) = client_ip {
                 upstream_req = upstream_req.header("X-Forwarded-For", ip.to_string());
+            }
+            if let Some(host) = original_host {
+                upstream_req = upstream_req.header("Host", host);
+                upstream_req = upstream_req.header("X-Forwarded-Host", host);
             }
             if let Some(ct) = content_type {
                 upstream_req = upstream_req.header("Content-Type", ct);

@@ -1,6 +1,8 @@
-# Dromedary — Gaia's sovereign reverse proxy
-# nestgate.io IS the optic chiasm — one domain, one port, all organs visible.
-# Port numbers are anti-ZK. songbird routes internally.
+# DROMEDARY.TOML - Klein Face Unified Config
+# *.primals.eco = OUTER TRANS (public, outward)
+# *.primal.eco  = INNER TRANS (singular, inward)
+# *.nestgate.io = CIS (self-center)
+# Klein surface = all three are the SAME surface
 
 http_port = 80
 https_port = 443
@@ -14,9 +16,10 @@ frame_options = "SAMEORIGIN"
 referrer_policy = "strict-origin-when-cross-origin"
 permissions_policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
 custom = [
-    ["X-Membrane-Wave", "240"],
+    ["X-Membrane-Wave", "233"],
     ["X-Organism", "Gaia"],
     ["X-Powered-By", "Dromedary/0.1.0 (Pure Rust)"],
+    ["X-Klein-Face", "unified"],
 ]
 
 [blackwall]
@@ -24,64 +27,66 @@ block_meta = true
 blocked_agents = [
     "meta-externalagent", "facebookexternalhit", "FacebookBot",
     "WhatsApp", "Instagram", "Threads", "MetaAI",
+    "GPTBot", "CCBot", "anthropic-ai", "ClaudeBot", "Bytespider",
 ]
 blocked_cidrs = [
     "57.141.0.0/16", "69.63.176.0/20", "69.171.224.0/19",
     "157.240.0.0/16", "129.134.0.0/16", "163.70.128.0/17",
 ]
+poison_body = "403 - BLACKWALL. Sovereign infrastructure. AGPL-3.0-or-later."
 
-# nestgate.io — THE OPTIC CHIASM — gate serves all 679+ objects
+# === CIS FACE - nestgate.io ===
 [[sites]]
-hostnames = ["nestgate.io", "www.nestgate.io", "api.nestgate.io", "tower.nestgate.io", "beacon.nestgate.io"]
-
+hostnames = ["nestgate.io", "www.nestgate.io", "api.nestgate.io", "tower.nestgate.io", "beacon.nestgate.io", "mcp.nestgate.io", "agent.nestgate.io"]
 [sites.backend]
 type = "proxy"
 upstream = "127.0.0.1:8443"
 
-# primals.eco — also through the gate now
+# === OUTER TRANS - primals.eco (gate handles host routing) ===
 [[sites]]
-hostnames = ["primals.eco", "www.primals.eco", "hud.primals.eco", "connect.primals.eco", "signal.primals.eco"]
-
+hostnames = ["primals.eco", "www.primals.eco", "hud.primals.eco", "connect.primals.eco", "sporeprint.primals.eco", "signal.primals.eco", "gaia.primals.eco", "polaris.primals.eco", "tamison.primals.eco", "kevin.primals.eco", "water.primals.eco", "guerilla.primals.eco", "relay.primals.eco", "beacon.primals.eco", "gallery.primals.eco", "library.primals.eco", "senses.primals.eco", "pulse.primals.eco", "identity.primals.eco", "cast.primals.eco"]
 [sites.backend]
 type = "proxy"
 upstream = "127.0.0.1:8443"
 
-# sporeprint — through the gate (cross-fold)
-[[sites]]
-hostnames = ["sporeprint.primals.eco"]
-
-[sites.backend]
-type = "proxy"
-upstream = "127.0.0.1:8443"
-
-# hypothesis
+# hypothesis - static Zola
 [[sites]]
 hostnames = ["hypothesis.primals.eco", "hypotheses.primals.eco"]
-
 [sites.backend]
 type = "static"
 root = "/home/eastgate/Development/ecoPrimals/infra/hypothesis/site/public"
 
-# detroit public record
+# detroit public record - static
 [[sites]]
 hostnames = ["detroit.primals.eco", "record.primals.eco", "publicrecord.primals.eco"]
-
 [sites.backend]
 type = "static"
 root = "/home/eastgate/Development/ecoPrimals/infra/publicRecord/site/public"
 
-# tuebor
+# tuebor - static Zola
 [[sites]]
 hostnames = ["tuebor.primals.eco"]
-
 [sites.backend]
 type = "static"
 root = "/home/eastgate/Development/ecoPrimals/infra/tuebor-repo/site/public"
 
-# Catch-all — through the gate
+# art, game, academy, etc - gate
+[[sites]]
+hostnames = ["art.primals.eco", "game.primals.eco", "academy.primals.eco", "campfire.primals.eco", "fossil.primals.eco", "klein.primals.eco", "api.primals.eco", "amicuscontra.primals.eco", "defenddetroit.primals.eco", "scyborg.primals.eco", "talos.primals.eco", "briefs.primals.eco"]
+[sites.backend]
+type = "proxy"
+upstream = "127.0.0.1:8443"
+
+# === INNER TRANS - primal.eco (redirect to plural) ===
+[[sites]]
+hostnames = ["primal.eco", "www.primal.eco"]
+[sites.backend]
+type = "redirect"
+target = "https://primals.eco"
+
+# === Catch-all wildcard ===
 [[sites]]
 hostnames = ["*"]
-
 [sites.backend]
 type = "proxy"
 upstream = "127.0.0.1:8443"
