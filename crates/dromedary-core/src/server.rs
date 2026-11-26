@@ -188,6 +188,13 @@ async fn route_request(
         .and_then(|v| v.to_str().ok())
         .map(|s| s.to_string());
 
+    // The visitor's own User-Agent goes on to the backend. reqwest sends none of its own, so without this
+    // every visitor reaches the backend with no User-Agent and a crawler cannot be told from a browser.
+    let user_agent = req.headers()
+        .get("user-agent")
+        .and_then(|v| v.to_str().ok())
+        .map(|s| s.to_string());
+
     let body_bytes = match axum::body::to_bytes(req.into_body(), 10 * 1024 * 1024).await {
         Ok(b) if !b.is_empty() => Some(b),
         _ => None,
@@ -197,14 +204,15 @@ async fn route_request(
     for route in &site.routes {
         let route_path = route.path.trim_end_matches('*');
         if path.starts_with(route_path) {
-            return serve_backend(&route.backend, &path, client_ip, method, body_bytes, content_type, Some(hostname)).await;
+            return serve_backend(&route.backend, &path, client_ip, method, body_bytes, content_type, user_agent, Some(hostname)).await;
         }
     }
 
-    serve_backend(&site.backend, &path, client_ip, method, body_bytes, content_type, Some(hostname)).await
+    serve_backend(&site.backend, &path, client_ip, method, body_bytes, content_type, user_agent, Some(hostname)).await
 }
 
 /// Serve a request against a specific backend.
+#[allow(clippy::too_many_arguments)]
 async fn serve_backend(
     backend: &SiteBackend,
     path: &str,
@@ -212,6 +220,7 @@ async fn serve_backend(
     method: reqwest::Method,
     body: Option<Bytes>,
     content_type: Option<String>,
+    user_agent: Option<String>,
     original_host: Option<&str>,
 ) -> Response {
     match backend {
@@ -287,6 +296,9 @@ async fn serve_backend(
             }
             if let Some(ct) = content_type {
                 upstream_req = upstream_req.header("Content-Type", ct);
+            }
+            if let Some(ua) = user_agent {
+                upstream_req = upstream_req.header("User-Agent", ua);
             }
             if let Some(b) = body {
                 upstream_req = upstream_req.body(b);
