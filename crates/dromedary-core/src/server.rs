@@ -172,6 +172,9 @@ async fn route_request(
     };
 
     let path = req.uri().path().to_string();
+    // What follows the "?" goes on to a proxied backend with the path, as the visitor sent it.
+    // Route matching and static files use the path alone.
+    let query = req.uri().query().map(|q| q.to_string());
     let method = match req.method().clone() {
         axum::http::Method::GET => reqwest::Method::GET,
         axum::http::Method::POST => reqwest::Method::POST,
@@ -204,11 +207,11 @@ async fn route_request(
     for route in &site.routes {
         let route_path = route.path.trim_end_matches('*');
         if path.starts_with(route_path) {
-            return serve_backend(&route.backend, &path, client_ip, method, body_bytes, content_type, user_agent, Some(hostname)).await;
+            return serve_backend(&route.backend, &path, client_ip, method, body_bytes, content_type, user_agent, query, Some(hostname)).await;
         }
     }
 
-    serve_backend(&site.backend, &path, client_ip, method, body_bytes, content_type, user_agent, Some(hostname)).await
+    serve_backend(&site.backend, &path, client_ip, method, body_bytes, content_type, user_agent, query, Some(hostname)).await
 }
 
 /// Serve a request against a specific backend.
@@ -221,6 +224,7 @@ async fn serve_backend(
     body: Option<Bytes>,
     content_type: Option<String>,
     user_agent: Option<String>,
+    query: Option<String>,
     original_host: Option<&str>,
 ) -> Response {
     match backend {
@@ -278,7 +282,10 @@ async fn serve_backend(
                 }
             }
             let scheme = if upstream.starts_with("http://") || upstream.starts_with("https://") { "" } else { "http://" };
-            let url = format!("{scheme}{upstream}{target_path}");
+            let url = match query.as_deref() {
+                Some(q) if !q.is_empty() => format!("{scheme}{upstream}{target_path}?{q}"),
+                _ => format!("{scheme}{upstream}{target_path}"),
+            };
             tracing::debug!("🐪 proxy {method} → {url}");
 
             let client = reqwest::Client::builder()
